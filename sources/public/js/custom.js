@@ -73,11 +73,25 @@ $(document).ready(function() {
     $(choosertxtid).val($(this).val().replace(/^.*[\/\\]/, ''));
   });
 
-  $('#save').click(function() {
-    $(this).prop('disabled', true);
+  $('#form').on("submit", function(event) {
+    event.preventDefault()
+    $('#save').prop('disabled', true);
     $('#save-loading').show();
-    $('#form').submit();
-  });
+    fetch(this.action, {
+      method: this.method,
+      headers: {
+        'X-Requested-With': 'fetch'
+      },
+      body: new FormData(this)
+    }).then(function (response) {
+      var location = response.headers.get("location")
+      if (location != null)
+        window.location = location
+    }).finally(function () {
+      $('#save').prop('disabled', false);
+      $('#save-loading').hide();
+    })
+  })
 
   $('#status .close').click(function() {
     $(this).parent().hide();
